@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "mssql": "^9.0.1",
+    "postgresql": "^0.0.1",
     "typescript": "^4.9.4"
   }
 }
