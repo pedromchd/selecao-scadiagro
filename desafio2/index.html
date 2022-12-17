@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desafio 2</title>
+  <style>
+    .m-0 { margin: 0; }
+    .h-screen { height: 100vh; }
+    .w-128 { width: 32rem; }
+    .w-\[100\%\] { width: 100%; }
+    .grid { display: grid; }
+    .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .place-items-center { place-items: center; }
+    .border-collapse { border-collapse: collapse; }
+    .font-mono { font-family: monospace; }
+    .text-left { text-align: left; }
+    .text-right { text-align: right; }
+    form > * { display: block; }
+    label + input { margin-bottom: 0.75em; }
+    th, td { border: 1px dashed; padding: 0.75em; }
+  </style>
+</head>
+
+<body class="m-0 h-screen grid grid-cols-2 place-items-center">
+  <div>
+    <form name="compras">
+      <label for="data"> Data da compra: </label>
+      <input type="text" name="data" id="data" placeholder="DD-MM-YYYY" required pattern="^(0\d|[1-2]\d|3[0-1])\/(0\d|1[0-2])\/(\d{4})$" />
+      <label for="fornecedor"> Fornecedor: </label>
+      <input type="text" name="fornecedor" id="fornecedor" required placeholder="Pedro Machado" />
+      <label for="valor"> Valor da compra: </label>
+      <input type="text" name="valor" id="valor" placeholder="1500,00" required pattern="^\d+,\d{2}$" />
+      <div>
+        <input type="submit" value="Adicionar" />
+      </div>
+    </form>
+  </div>
+  <div class="w-128">
+    <table id="tabela" class="border-collapse font-mono w-[100%] text-left">
+      <tr>
+        <th colspan="3">Compras Efetuadas</th>
+      </tr>
+      <tr>
+        <th>Data</th>
+        <th>Fornecedor</th>
+        <th>Valor</th>
+      </tr>
+      <tr id="row-total">
+        <td colspan="2" class="text-right">Total de Compras</td>
+        <td id="total"></td>
+      </tr>
+      <tr></tr>
+      <tr>
+        <th colspan="3">Sugestões de pagamento</th>
+      </tr>
+      <tr>
+        <td>À Vista</td>
+        <td>1 Parcela</td>
+        <td class="parcela1"></td>
+      </tr>
+      <tr>
+        <td rowspan="2">2x</td>
+        <td>1 Parcela</td>
+        <td class="parcela2"></td>
+      </tr>
+      <tr>
+        <td>2 Parcela</td>
+        <td class="parcela2"></td>
+      </tr>
+      <tr>
+        <td rowspan="3">3x</td>
+        <td>1 Parcela</td>
+        <td class="parcela3"></td>
+      </tr>
+      <tr>
+        <td>2 Parcela</td>
+        <td class="parcela3"></td>
+      </tr>
+      <tr>
+        <td>3 Parcela</td>
+        <td class="parcela3"></td>
+      </tr>
+    </table>
+  </div>
+  <script>
+    const compras = document.forms.compras;
+    const trbefore = document.querySelector('#row-total');
+    const tdtotal = document.querySelector('#total');
+    const valores = [];
+
+    const parcela1 = document.querySelector('.parcela1');
+    const parcela2 = document.querySelectorAll('.parcela2');
+    const parcela3 = document.querySelectorAll('.parcela3');
+
+    compras.addEventListener('submit', (evt) => {
+      evt.preventDefault();
+      const data = compras.data.value;
+      const fornecedor = compras.fornecedor.value;
+      const valor = compras.valor.value;
+      renderFatura(data, fornecedor, valor);
+      compras.reset();
+    });
+
+    function renderFatura(data, fornecedor, valor) {
+      const compra = `
+        <tr>
+          <td>${data}</td>
+          <td>${fornecedor}</td>
+          <td>${valor}</td>
+        </tr>
+      `;
+      valores.push(Number(valor.replace(',', '.')));
+      const total = valores.reduce(
+        (total, valor) => total + valor, 0
+      );
+      trbefore.insertAdjacentHTML('beforebegin', compra);
+      tdtotal.innerText = formatCurrency(total);
+      parcela1.innerText = formatCurrency(total);
+      parcela2.forEach(p => p.innerText = formatCurrency(total / 2));
+      parcela3.forEach(p => p.innerText = formatCurrency(total / 3));
+    }
+
+    function formatCurrency(valor) {
+      const inteiro = parseInt(valor);
+      const decimal = String(valor % inteiro);
+      const digito1 = decimal[2] ? decimal[2] : 0;
+      const digito2 = decimal[3] ? decimal[3] : 0;
+      return `${inteiro},${digito1}${digito2}`;
+    }
+  </script>
+</body>
+
+</html>
